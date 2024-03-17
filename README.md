@@ -13,13 +13,20 @@ Este componente de la aplicación se encarga de cargar los sonidos y proporciona
 4. Main
 El archivo principal de la aplicación, que gestiona el canvas y todas las interacciones del juego. Algunos de los métodos más importantes incluyen:
 
-drawCanvas: Dibuja los elementos visuales en el canvas, como triángulos separados por un límite y un círculo negro superpuesto.
-changeColor: Modifica el brillo de los colores utilizando un valor de alfa y un entero como parámetros. Este método permite cambiar dinámicamente el brillo de los colores utilizados en el juego.
-detectTouch: Detecta los clics del usuario, identifica el centro para iniciar o pausar la partida, y maneja la detección de los colores. También bloquea los clics si el juego está en curso.
-startGame: Prepara y ejecuta el inicio de una nueva partida.
-createGameArray: Genera un array de secuencia aleatoria cada vez que se inicia una partida.
-loseGame: Se ejecuta cuando el jugador pierde y finaliza la partida.
-playArray: Reproduce la secuencia de colores del juego, aumentando la dificultad con cada ronda y ajustando el brillo de los colores.
-comparaClick: Compara el clic del jugador con la secuencia correcta para determinar si es válido.
+- drawCanvas: Dibuja los elementos visuales en el canvas, incluyendo triángulos separados por un límite y un círculo negro superpuesto.
+
+- changeColor: Modifica dinámicamente el brillo de los colores utilizados en el juego, utilizando un valor de alfa y un entero como parámetros.
+
+- detectTouch: Detecta los clics del usuario, identifica el centro para iniciar o pausar la partida, y maneja la detección de colores. También bloquea los clics si el juego está en curso.
+
+- startGame: Prepara y ejecuta el inicio de una nueva partida.
+
+- createGameArray: Genera un array de secuencia aleatoria cada vez que se inicia una partida.
+
+- loseGame: Finaliza la partida y muestra el mensaje de derrota cuando el jugador pierde.
+
+- playArray: Reproduce la secuencia de colores del juego, aumentando la dificultad con cada ronda y ajustando el brillo de los colores.
+
+- comparaClick: Compara el clic del jugador con la secuencia correcta para determinar si es válido.
 
 Esta estructura modular ayuda a mantener el código organizado y facilita la comprensión y el mantenimiento de la aplicación.
