@@ -10,10 +10,12 @@
     import android.view.SurfaceHolder
     import androidx.appcompat.app.AppCompatActivity
     import com.example.simon.databinding.ActivityMainBinding
+    import kotlin.math.log
     import kotlin.random.Random
 
     class MainActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private lateinit var binding: ActivityMainBinding
+        private lateinit var soundManager: SoundManager
 
         private val glow = 255
         private val dark = 128
@@ -24,6 +26,7 @@
 
         val gameRandomList = mutableListOf<Int>()
         var gameSequence = 1;
+        var playerSequence = 0;
         private var isClickEnabled = true
         private val clickDelayMillis: Long = 1000
         private var gameStart = false
@@ -33,9 +36,11 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            soundManager = SoundManager(this)
+
             val surfaceView = binding.surfaceView
             surfaceView.holder.addCallback(this)
-
+            binding.Title.text = "Play"
             surfaceView.setOnTouchListener { _, event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -151,7 +156,13 @@
             }
             if (distance <= smallCircleRadius) {
                 gameStart = !gameStart
-                startGame()
+                if(gameStart){
+                    binding.Title.text = "Pause"
+                    startGame()
+                }else{
+                    binding.Title.text = "Play"
+                }
+
                 return
             }
             if(!gameStart){
@@ -185,13 +196,16 @@
                 }
                 else -> drawCanvas(binding.surfaceView.holder)
             }
+            soundManager.playSound(selected)
             drawCanvas(binding.surfaceView.holder)
             Handler(Looper.getMainLooper()).postDelayed({
                 changeColor(dark,selected)
                 drawCanvas(binding.surfaceView.holder)
             }, clickDelayMillis)
+            compareClick(selected);
         }
         private fun createGameArray(){
+            gameRandomList.clear()
             repeat(50) {
                 gameRandomList.add(Random.nextInt(4))
             }
@@ -200,21 +214,61 @@
             if(!gameStart){
                 return
             }
-            gameSequence = 1;
             createGameArray();
+            gameSequence = 1;
             playArray();
         }
-        private fun playArray(){
-            isClickEnabled = false;
-            for(i in 0 until gameSequence){
-                changeColor(glow, gameRandomList[i])
-                drawCanvas(binding.surfaceView.holder)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    changeColor(dark, gameRandomList[i])
-                    drawCanvas(binding.surfaceView.holder)
-                    gameSequence++
-                }, clickDelayMillis)
-            }
-            isClickEnabled = true;
+        private fun loseGame(){
+            binding.Score.text = "Lose"
+            isClickEnabled=true
+            gameStart = false
         }
+        private fun playArray() {
+            isClickEnabled = false
+            val handler = Handler(Looper.getMainLooper())
+
+            var currentIndex = 0
+
+            fun changeColorDelayed(index: Int) {
+                if (!gameStart) {
+                    isClickEnabled = true
+                    return
+                }
+                handler.postDelayed({
+                    changeColor(glow, gameRandomList[index])
+                    soundManager.playSound(gameRandomList[index])
+                    drawCanvas(binding.surfaceView.holder)
+
+                    handler.postDelayed({
+                        changeColor(dark, gameRandomList[index])
+                        drawCanvas(binding.surfaceView.holder)
+
+                        if (index + 1 < gameSequence) {
+                            changeColorDelayed(index + 1)
+                        } else {
+                            gameSequence++
+                            isClickEnabled = true                        }
+                    }, 1000)
+                }, (1000).toLong())
+            }
+            changeColorDelayed(currentIndex)
+        }
+        private fun compareClick(selected: Int) {
+            if (selected != gameRandomList[playerSequence]) {
+                loseGame()
+                return
+            }
+
+            playerSequence++
+            if (playerSequence === gameSequence - 1) {
+                binding.Score.text = playerSequence.toString();
+                playerSequence = 0
+                Handler(Looper.getMainLooper()).postDelayed({
+                    playArray()
+                }, clickDelayMillis)
+            } else {
+                isClickEnabled = true
+            }
+        }
+
     }
